@@ -228,7 +228,7 @@
 
                 $.observable(venues.ref).refresh(venues.ref.sort());
                 $.observable(venues).setProperty('list', ordered);           
-            });
+            }).error(function() { $('#content').html(tmpl('tmpl-all-items', venues)); });
         }
 
         $(document).ready(function(){
