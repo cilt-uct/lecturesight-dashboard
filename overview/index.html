@@ -99,7 +99,7 @@
                 .reduce( (res, key) => Object.assign(res, { [key]: obj[key] }), {} );
 
         function draw() {
-            console.log('draw');
+            //console.log('draw');
 
             // save to redraw            
             $('#nav-side').html(tmpl('tmpl-nav', venues));
@@ -116,7 +116,8 @@
                             b = moment(item.updated),
                             status = a.diff(b, 'minutes', true) < -5 ? 'offline' : item.status;
 
-                        console.log(item.id +' '+ a.diff(b, 'minutes', true) );
+                        //console.log(item.id +' '+ a.diff(b, 'minutes', true) );
+			el.data('time', item.updated);
                         el.find('.thumb').attr('src', item.id +'-overview.png?t='+ Date.now()).siblings('.red').remove();
                         el.find('.time').html(moment(item.updated).calendar());
                         el.find('.status').html( status );
@@ -137,7 +138,7 @@
 
                 // $.diff(venues.items, venues.old) added items
                 var removed = $.diff(venues.old, venues.items) // removed items
-                console.log(removed);
+                //console.log(removed);
                 $.each(removed, function(i, item){
                     var el = $('#img-'+ item);
                     if ( el.exists() ) {
