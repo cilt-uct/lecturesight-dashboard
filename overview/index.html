@@ -248,10 +248,10 @@
             $('#content').on('click', 'a', function(event){
                 event.preventDefault();
 
-                var show = $(this).hasClass('active');
-                $('#content a').removeClass('active');
+                var show = $(this).hasClass('sel');
+                $('#content a').removeClass('sel');
                 if (!show) {
-                    $(this).addClass('active');
+                    $(this).addClass('sel');
                 }
             });
 
