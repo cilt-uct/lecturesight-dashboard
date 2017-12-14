@@ -35,7 +35,7 @@ my $json = encode_json \%venue_list;
 #print "$json\n";
 
 open(my $fh, '>', $dir .'/venues.json');
-print $fh $json;
+print $fh $json . "\n";
 close $fh;
 
 closedir(DIR);

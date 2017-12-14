@@ -204,7 +204,7 @@
                 $.observable(venues.ref).refresh([]);
                 $.observable(venues.old).refresh(venues.items);
                 $.observable(venues.items).refresh([]);
-                $.each(data, function(i, el) {
+                $.each(ordered, function(i, el) {
                     var ref = i.substring(0,1);
 
                     if (diff != ref) {
