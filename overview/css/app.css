@@ -121,24 +121,24 @@ img {
     opacity: 0.5;
 }
 
-#content a.recording {
+#content a.active {
     border-color: #00AD00 !important;
 }
 
-#content a.recording span {
+#content a.active span {
     background-color: #F2FDED;
     color: #009900;
 }
 
-#content .item.recording span.status {
+#content .item.active span.status {
     color: #009900;
 }
 
-#content a.recording .img {
+#content a.active .img {
     opacity: 0.5;
 }
 
-#content a.active {
+#content a.sel {
     grid-column: span 3;
     grid-row: span 3;
 

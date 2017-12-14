@@ -103,6 +103,7 @@
 
             // save to redraw            
             $('#nav-side').html(tmpl('tmpl-nav', venues));
+            $('#content .empty').remove();
 
             if ($('#content').children().length === 0) {
                 // new
@@ -112,12 +113,12 @@
                 $.each(venues.items, function(i, item){
                     var el = $('#img-'+ item.id);
                     if ( el.exists() ) {
-                        var a = moment(el.data('time')),
+                        var a = moment(), //el.data('time')),
                             b = moment(item.updated),
-                            status = a.diff(b, 'minutes', true) < -5 ? 'offline' : item.status;
+                            status = a.diff(b, 'minutes', true) > 5 ? 'offline' : item.status;
 
                         //console.log(item.id +' '+ a.diff(b, 'minutes', true) );
-			el.data('time', item.updated);
+			            el.data('time', item.updated);
                         el.find('.thumb').attr('src', item.id +'-overview.png?t='+ Date.now()).siblings('.red').remove();
                         el.find('.time').html(moment(item.updated).calendar());
                         el.find('.status').html( status );
@@ -294,8 +295,12 @@
         </div></div>
     </script>
     <script type="text/x-tmpl" id="tmpl-item">
-        {% var point = getCalibrationPoint(o); %}
-        <a href="#" id="img-{%=o.id%}" data-ref="{%=o.id%}" data-time="{%=o.updated%}" rel="{%=o.id%}" class="item {%=o.status%}">
+        {% var point = getCalibrationPoint(o); 
+           var a = moment(),
+               b = moment(o.updated),
+               status = a.diff(b, 'minutes', true) > 5 ? 'offline' : o.status;
+        %}
+        <a href="#" id="img-{%=o.id%}" data-ref="{%=o.id%}" data-time="{%=o.updated%}" rel="{%=o.id%}" class="item {%=status%}">
             <div class="img">
                 <div>
                 <img src="{%=o.id%}-overview.png?t={%=Date.now()%}" alt="" class="thumb" />
@@ -304,7 +309,7 @@
             </div>
             <span class="text">{%=o.id%}</span>
             <span class="time">{%=moment(o.updated).calendar()%}</span>
-            <span class="status">{%=o.status%}</span>
+            <span class="status">{%=status%}</span>
         </a>
     </script>
     <script type="text/x-tmpl" id="tmpl-target">
