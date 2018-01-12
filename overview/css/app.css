@@ -118,7 +118,7 @@ img {
 }
 
 #content a.offline .img {
-    opacity: 0.5;
+    opacity: 1.0;
 }
 
 #content a.active {
@@ -135,7 +135,7 @@ img {
 }
 
 #content a.active .img {
-    opacity: 0.5;
+    opacity: 1.0;
 }
 
 #content a.sel {
