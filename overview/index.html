@@ -8,7 +8,7 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/app.css?t=208-02-02">
+    <link rel="stylesheet" href="css/app.css?t=2018-02-02">
 
     <script src="js/jquery.min.js"></script>
   </head>
@@ -19,7 +19,8 @@
 
         <nav class="nav nav-pills d-flex justify-content-start">
             <a class="flex-sm-fill text-sm-center nav-link active" data-filter="all" href="#" id="filter-all">All <span class="badge badge-light"></span></a>
-            <a class="flex-sm-fill text-sm-center nav-link" data-filter="online" href="#" id="filter-online">Online <span class="badge badge-light"></span></a>
+            <a class="flex-sm-fill text-sm-center nav-link" data-filter="idle" href="#" id="filter-idle">Idle <span class="badge badge-light"></span></a>
+            <a class="flex-sm-fill text-sm-center nav-link" data-filter="active" href="#" id="filter-active">Active <span class="badge badge-light"></span></a>
             <a class="flex-sm-fill text-sm-center nav-link" data-filter="offline" href="#" id="filter-offline">Offline <span class="badge badge-light"></span></a>
         </nav>
     </header>
@@ -38,17 +39,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="item">
-                        <div class="img">
-                            <div>
-                                <img id="imgModal-img" src="" alt="" />
-                                <div class="red" style="width:1.7688679245283019%; height:3.125%; top:21.458333333333332%; left:51.65094339622641%;"></div>
-                            </div>
-                        </div>
-                        <span class="text">{%=o.id%}</span>
-                        <span class="time">{%=moment(o.updated).calendar()%}</span>
-                        <span class="status">{%=status%}</span>
-                    </div>
+                    <div class="item"></div>
                 </div>
             </div>
         </div>
@@ -176,7 +167,7 @@
                 }).appendTo('#content');
             }
 
-            $.each(['all','online','offline'], function(i, el){
+            $.each(['all','idle', 'active', 'offline'], function(i, el){
                 $('#filter-'+ el +' > span').html($('#content .item'+ (el != 'all' ? '.'+el : '')).length);
             });
         }
