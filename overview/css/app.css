@@ -5,6 +5,8 @@ html, body {
 
 body {
     background-image: linear-gradient(to left bottom, #eeeeee, #f2f2f2, #f6f6f6, #fbfbfb, #ffffff);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     display: flex;
     flex-direction: column;
     height: 100vh; /* Avoid the IE 10-11 `min-height` bug. */
@@ -13,19 +15,48 @@ body {
 h1 {
     font-size: 1.64rem;
     font-weight: normal;
-    margin: 0;
-    margin-bottom: 0.8rem;
+    margin: 0 5rem 0.8rem 0;
     line-height: 1;
     color: #222222;
+    float: left;
 }
 
 header {
     margin: 3rem 4rem 0rem; 
 }
 
-header nav a.nav-link {
+header nav {
+    position: relative;
+    top: -4px;
+}
+
+header nav.nav-pills a.nav-link {
+    color: #333;
     font-size: 0.8em;
     min-width: 2rem;
+    padding: 0.3rem 0.5rem 0.3rem 1rem;
+    background-color: transparent;
+}
+
+header nav.nav-pills a.nav-link .badge {
+    position: relative;
+    top: -2px;
+    margin-left: 0.6em;
+}
+
+header nav.nav-pills a.nav-link:hover {
+    color: #0032A4;
+    background-color: #ddd;
+}
+
+header nav.nav-pills a.nav-link.active {
+    color: #eee;
+    background-color: #0032A4;
+}
+
+header nav.nav-pills a.nav-link.active:hover {
+    color: #fff;
+    background: #007bff;
 }
 
 section {
@@ -41,6 +72,11 @@ img {
     flex: 1 0 auto; /* Prevent Chrome, Opera, and Safari from letting these items shrink to smaller than their content's default minimum size. */
     position: relative;
     padding-left: 1em;
+}
+
+#content .anchor {
+    position: relative;
+    top: -20px;
 }
 
 #content > div {
@@ -81,10 +117,8 @@ img {
     font-weight: 800;
 }
 
-#content .item {
-    background-color: #000;
-    box-shadow: 3px 2px 12px rgba(0, 0, 0, 0.22);
-    border: 1px solid #eee;
+#content .item, 
+#imgModal .item {
     color: #000;
     text-decoration: none;
     position: relative;
@@ -100,6 +134,16 @@ img {
     z-index: 100;
 }
 
+#content .item {
+    background-color: #000;
+    box-shadow: 3px 2px 12px rgba(0, 0, 0, 0.22);
+    border: 1px solid #eee;
+}
+
+#content .item.hidden {
+    display: none;
+}
+
 #content a.removed {
     opacity: 0.3;
 }
@@ -113,7 +157,8 @@ img {
     color: #FF5474;
 }
 
-#content .item.offline span.status {
+#content .item.offline span.status,
+#imgModal .item.offline span.status {
     color: #FF5474;
 }
 
@@ -130,7 +175,8 @@ img {
     color: #009900;
 }
 
-#content .item.active span.status {
+#content .item.active span.status,
+#imgModal .item.active span.status {
     color: #009900;
 }
 
@@ -145,21 +191,24 @@ img {
     opacity: 1;
 }
 
-#content .item:hover,
-#content .item:active {
+#content a.item:hover,
+#content a.item:active {
     border-color: #378DD4;
     box-shadow: 3px 2px 12px rgba(0, 0, 0, 0.44);
 }
 
-#content .item > .img {
+#content .item > .img,
+#imgModal .item > .img {
     grid-column-start: span 3;
 }
 
-#content .item .img > div {
+#content .item .img > div,
+#imgModal .item .img > div {
     position: relative;
 }
 
-#content .item .img > div::before {
+#content .item .img > div::before,
+#imgModal .item .img > div::before {
     content: "";
     position: absolute;
     left: 50%;
@@ -167,7 +216,8 @@ img {
     background-color: rgba(255, 152, 85, 0.72); /*#FF8E00*/
     width: 1px;
 }
-#content .item .img > div::after {
+#content .item .img > div::after,
+#imgModal .item .img > div::after {
     content: "";
     position: absolute;
     left: 0;
@@ -177,7 +227,10 @@ img {
     width: 100%;
 }
 
-#content .item .red {
+#content .item .red,
+#imgModal .item .red,
+#content .item .red2,
+#imgModal .item .red2 {
     border: 1px solid red;
     width: 20px;
     height: 20px;
@@ -186,28 +239,36 @@ img {
     position: absolute;
 }
 
-#content .item span {
+
+#content .item .red2,
+#imgModal .item .red2 {
+    border: 1px solid #9F0000;
+}
+
+#content .item span,
+#imgModal .item span {
     background-color: #fff;
     padding: 0.8rem;
     font-size: 0.9rem;
     width: 100%;
 }
 
-#content .item span.time {
+#content .item span.time,
+#imgModal .item span.time {
     font-size: 66%;
     padding-top: 1.5em;
 }
 
-#content .item span.status {
+#content .item span.status,
+#imgModal .item span.status {
     color: #656576;
     font-size: 0.9em;
     min-width: 90px;
     text-align: right;
 }
 
-
-
-#content .item small {
+#content .item small,
+#imgModal .item small {
     position: absolute;
     bottom: 62px;
     right: 8px;
@@ -267,4 +328,16 @@ aside li > a:active {
 
 aside li > a:active {
     top: 2px;
+}
+
+#imgModal.fade {
+    transition: opacity 0.02s linear;
+}
+#imgModal.fade .modal-dialog {
+    transition: -webkit-transform 0.1s ease-out;
+    transition: transform 0.1s ease-out;
+    transition: transform 0.1s ease-out, -webkit-transform 0.1s ease-out;
+    
+    -webkit-transform: translate(0, 0);
+    transform: translate(0, 0);
 }

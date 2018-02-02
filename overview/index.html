@@ -17,18 +17,11 @@
     <header>
         <h1 class="title">LectureSight <small>Overview</small></h1>
 
-        <!--nav class="nav nav-pills d-flex justify-content-start">
-            <div class="p-2">
-                <a class="text-sm-center nav-link active" href="#">All</a>
-                <a class="text-sm-center nav-link" href="#">Online</a>
-                <a class="text-sm-center nav-link" href="#">Offline</a>
-            </div>    
-            <div class="ml-auto p-2">
-                <a class="flex-sm-fill text-sm-center nav-link active" href="#">All</a>
-                <a class="flex-sm-fill text-sm-center nav-link" href="#">Online</a>
-                <a class="flex-sm-fill text-sm-center nav-link" href="#">Offline</a>
-            </div>
-        </nav-->
+        <nav class="nav nav-pills d-flex justify-content-start">
+            <a class="flex-sm-fill text-sm-center nav-link active" data-filter="all" href="#" id="filter-all">All <span class="badge badge-light"></span></a>
+            <a class="flex-sm-fill text-sm-center nav-link" data-filter="online" href="#" id="filter-online">Online <span class="badge badge-light"></span></a>
+            <a class="flex-sm-fill text-sm-center nav-link" data-filter="offline" href="#" id="filter-offline">Offline <span class="badge badge-light"></span></a>
+        </nav>
     </header>
 
     <aside id="nav-side"></aside>
@@ -41,11 +34,21 @@
                 <div class="modal-header">
                     <h5 class="modal-title" id="imgModal-title">Modal title</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <img id="imgModal-img" src="" alt="" />
+                    <div class="item">
+                        <div class="img">
+                            <div>
+                                <img id="imgModal-img" src="" alt="" />
+                                <div class="red" style="width:1.7688679245283019%; height:3.125%; top:21.458333333333332%; left:51.65094339622641%;"></div>
+                            </div>
+                        </div>
+                        <span class="text">{%=o.id%}</span>
+                        <span class="time">{%=moment(o.updated).calendar()%}</span>
+                        <span class="status">{%=status%}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -92,6 +95,10 @@
                 return d;
             }
         });
+        function getItemStatus(o) {
+            var a = moment(), b = moment(o.updated);             
+            return  a.diff(b, 'minutes', true) > 5 ? 'offline' : o.status;
+        }
 
         Object.filter = (obj, predicate) => 
             Object.keys(obj)
@@ -99,7 +106,7 @@
                 .reduce( (res, key) => Object.assign(res, { [key]: obj[key] }), {} );
 
         function draw() {
-            //console.log('draw');
+            console.log('draw');
 
             // save to redraw            
             $('#nav-side').html(tmpl('tmpl-nav', venues));
@@ -168,27 +175,36 @@
                     return $(b).data('ref') < $(a).data('ref');
                 }).appendTo('#content');
             }
+
+            $.each(['all','online','offline'], function(i, el){
+                $('#filter-'+ el +' > span').html($('#content .item'+ (el != 'all' ? '.'+el : '')).length);
+            });
         }
 
         function getCalibrationPoint(item) {
             var cal = Array.isArray(item.profile) ? item.profile.filter(function(el){ return $.inArray("CALIBRATION", el) >= 0 ? el : null; }) : [];
             var size = Array.isArray(item.profile) ? item.profile.filter(function(el){ return $.inArray("SIZE", el) >= 0 ? el : null; }) : [];
+            var result = [];
 
             if ((cal.length >= 1) && (size.length >= 1)) { 
-                cal = cal[0];
                 size = size[0];
 
-                if ((cal.length === 6) && (size.length === 6)) { 
-                
-                    return {
-                        x: parseInt(cal[2], 10) / parseInt(size[4], 10) * 100, 
-                        y: parseInt(cal[3], 10) / parseInt(size[5], 10) * 100, 
-                        w: parseInt(cal[4], 10) / parseInt(size[4], 10) * 100,
-                        h: parseInt(cal[5], 10) / parseInt(size[5], 10) * 100
-                    };
+                if (size.length === 6) { 
+                    $.each(cal, function(i, el){
+                        if (el.length === 6) {
+                            result.push({ name: el[1], 
+                                x: parseInt(el[2], 10) / parseInt(size[4], 10) * 100, 
+                                y: parseInt(el[3], 10) / parseInt(size[5], 10) * 100, 
+                                w: parseInt(el[4], 10) / parseInt(size[4], 10) * 100,
+                                h: parseInt(el[5], 10) / parseInt(size[5], 10) * 100
+                            });
+                        }
+                    });
                 }
             }
-            return null;
+            console.log(result);
+
+            return result;
         }
 
         function getStatus(file) {
@@ -233,6 +249,16 @@
             }).error(function() { $('#content').html(tmpl('tmpl-all-items', venues)); });
         }
 
+        function showModal(o) {
+
+            $('#imgModal-title').html('View - '+ o.id);
+            $('#imgModal .modal-body > .item').removeClass('offline active removed')
+                .addClass(getItemStatus(o))
+                .html( tmpl('tmpl-item-internal', o) );
+            $('#imgModal [data-toggle="tooltip"]').tooltip();
+            $('#imgModal').modal('show');
+        }
+
         $(document).ready(function(){
 
             var ov = $.observable(venues);
@@ -248,45 +274,53 @@
             $('#content').on('click', 'a', function(event){
                 event.preventDefault();
 
-                var show = $(this).hasClass('sel');
-                $('#content a').removeClass('sel');
-                if (!show) {
-                    $(this).addClass('sel');
-                }
+                showModal( getObj($(this).data('ref'), venues.items) );
             });
 
-            /*
-            $(".filter-button").click(function(){
+            $('header > nav > a').on('click', function(event){
                 var value = $(this).attr('data-filter');
-                
-                if(value == "all")
-                {
-                    //$('.filter').removeClass('hidden');
-                    $('.filter').show('1000');
+
+                if(value == 'all') {
+                    $('#content .item').removeClass('hidden');
+                } else {
+                    $('#content .item').not('.'+value).addClass('hidden');
+                    $('#content .item').filter('.'+value).removeClass('hidden');
                 }
-                else
-                {
-                    $(".filter").not('.'+value).hide('3000');
-                    $('.filter').filter('.'+value).show('3000');
+                $('header > nav > a').removeClass('active');
+                $(this).addClass('active');
+
+                $('#content > div:not(.empty)').each(function(i, el){
+                    var side = $('#nav-side a[ref='+ $(el).data('ref').toString().toLowerCase() +']');
+                    
+                    if ($(el).find('.item').length === $(el).find('.hidden').length) {
+                        $(el).hide();
+                        side.hide();
+                    } else {
+                        $(el).show();
+                        side.show();
+                    }
+                });
+
+                if ($('#content > div:not(.empty):visible').length == 0) {
+                    $('#content .empty').show();
+                } else {
+                    $('#content .empty').hide();
                 }
             });
-            
-            if ($(".filter-button").removeClass("active")) {
-                $(this).removeClass("active");
-            }
-            $(this).addClass("active");
-            */
         });
     </script>
     <!-- Templates -->
     <script type="text/x-tmpl" id="tmpl-all-items">
-        {% if (o.ref.length > 0 ) { $.each(o.ref, function( i, v ) { 
-            var filtered = $.map(o.items, function(i, e) { if (i.ref == v) return i; });
-            include('tmpl-group-items', {ref: v, list: filtered});
-        }); } else { %}<div class="empty">No venues <small>refer to readme for setup instructions</small></div>{% } %}
+        {% if (o.ref.length > 0 ) { 
+            $.each(o.ref, function( i, v ) { 
+                var filtered = $.map(o.items, function(i, e) { if (i.ref == v) return i; });
+                include('tmpl-group-items', {ref: v, list: filtered});
+            }); 
+            %}<div class="empty" style="display:none;">No venues <small>change the filters see matching venues</small></div>{%
+        } else { %}<div class="empty">No venues <small>refer to readme for setup instructions</small></div>{% } %}
     </script>
     <script type="text/x-tmpl" id="tmpl-group-items">
-        <div id="gallery-{%=o.ref%}" data-ref="{%=o.ref.toUpperCase()%}"><a name="{%=o.ref%}"></a><div class="grid">
+        <div id="gallery-{%=o.ref%}" data-ref="{%=o.ref.toUpperCase()%}"><a name="{%=o.ref%}" class="anchor"></a><div class="grid">
         {%  $.each(o.list, function( j, item ) { 
                 if (typeof item.id === 'string') {
                     include('tmpl-item', item);
@@ -295,25 +329,31 @@
         </div></div>
     </script>
     <script type="text/x-tmpl" id="tmpl-item">
-        {% var point = getCalibrationPoint(o); 
-           var a = moment(),
-               b = moment(o.updated),
-               status = a.diff(b, 'minutes', true) > 5 ? 'offline' : o.status;
+        {%
+            var status = getItemStatus(o);
         %}
         <a href="#" id="img-{%=o.id%}" data-ref="{%=o.id%}" data-time="{%=o.updated%}" rel="{%=o.id%}" class="item {%=status%}">
-            <div class="img">
-                <div>
-                <img src="{%=o.id%}-overview.png?t={%=Date.now()%}" alt="" class="thumb" />
-                {% if (point) { include('tmpl-target', point); } %}
-                </div>
-            </div>
-            <span class="text">{%=o.id%}</span>
-            <span class="time">{%=moment(o.updated).calendar()%}</span>
-            <span class="status">{%=status%}</span>
+            {% include('tmpl-item-internal', o); %}
         </a>
     </script>
+    <script type="text/x-tmpl" id="tmpl-item-internal">
+        {% var point = getCalibrationPoint(o); 
+            var status = getItemStatus(o);
+         %}
+         <div class="img">
+            <div>
+            <img src="{%=o.id%}-overview.png?t={%=Date.now()%}" alt="" class="thumb" />
+            {% include('tmpl-target', point); %}
+            </div>
+        </div>
+        <span class="text">{%=o.id%}</span>
+        <span class="time">{%=moment(o.updated).calendar()%}</span>
+        <span class="status {%=status%}">{%=status%}</span>
+    </script>        
     <script type="text/x-tmpl" id="tmpl-target">
-        <div class="red" style="width:{%=o.w%}%; height:{%=o.h%}%; top:{%=o.y%}%; left:{%=o.x%}%;"></div>
+        {% $.each(o, function( i, v ) { %}
+        <div data-toggle="tooltip" data-placement="top" title="{%=v.name%}" class="{%=(v.name == 'lectern' ? 'red' : 'red2')%}" style="width:{%=v.w%}%; height:{%=v.h%}%; top:{%=v.y%}%; left:{%=v.x%}%;"></div>
+        {% }); %}
     </script>
     
     <script type="text/x-tmpl" id="tmpl-nav">
