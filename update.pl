@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-## Scan the overview directory and get the status file to create a venues.json file for indec.html to process.
+## Scan the overview directory and get the status file to create a venues.json file for index.html to process.
 
 ## 2017-12-12: Corne Oosthuizen
 
@@ -14,7 +14,7 @@ my $dir = '/usr/share/nginx/lecturesight/overview';
 opendir(DIR, $dir) or die $!;
 
 my @status_files
-   = grep { 
+   = grep {
       /status\.txt/
       && -f "$dir/$_"   # and is a file
    } readdir(DIR);

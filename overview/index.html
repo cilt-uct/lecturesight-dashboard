@@ -13,7 +13,7 @@
     <script src="js/jquery.min.js"></script>
   </head>
   <body>
-   
+
     <header>
         <h1 class="title">LectureSight <small>Overview</small></h1>
 
@@ -48,7 +48,7 @@
     <footer class="d-flex justify-content-center">
         <p>&copy; University of Cape Town 2017. All rights reserved.</p>
     </footer>
-   
+
     <script src="js/tmpl.min.js"></script>
     <script src="js/moment.min.js"></script>
     <script src="js/jquery.observable.min.js"></script>
@@ -60,8 +60,8 @@
             update_timer_id = null, update_delay = 60000; // 60 sec
 
         function getObj(id, arr, key) { key = key || 'id'; var o = null; $.each(arr, function (i, el) { if (el[key] == id) { o=el; return; } }); return o; };
-        function setTimer(id, delay, func, action) { 
-            action = action || 'Timeout'; 
+        function setTimer(id, delay, func, action) {
+            action = action || 'Timeout';
             if (id !== null) {
                 window['clear'+ action] (id);
             }
@@ -73,7 +73,7 @@
                 var a = jQuery.extend(true, [], arrayA);
                 var b = jQuery.extend(true, [], arrayB);
                 var d = [];
-                
+
                 for (var i = 0, l = a.length; i < l; i++) {
                     var found = false;
                     for (var j = 0, k = b.length; j < k; j++) {
@@ -87,19 +87,19 @@
             }
         });
         function getItemStatus(o) {
-            var a = moment(), b = moment(o.updated);             
+            var a = moment(), b = moment(o.updated);
             return  a.diff(b, 'minutes', true) > 5 ? 'offline' : o.status;
         }
 
-        Object.filter = (obj, predicate) => 
+        Object.filter = (obj, predicate) =>
             Object.keys(obj)
                 .filter( key => predicate(obj[key]) )
                 .reduce( (res, key) => Object.assign(res, { [key]: obj[key] }), {} );
 
         function draw() {
-            console.log('draw');
+            //console.log('draw');
 
-            // save to redraw            
+            // save to redraw
             $('#nav-side').html(tmpl('tmpl-nav', venues));
             $('#content .empty').remove();
 
@@ -107,7 +107,7 @@
                 // new
                 $('#content').html(tmpl('tmpl-all-items', venues));
             } else {
-                // update - existing 
+                // update - existing
                 $.each(venues.items, function(i, item){
                     var el = $('#img-'+ item.id);
                     if ( el.exists() ) {
@@ -160,7 +160,7 @@
                         return $(b).data('ref') < $(a).data('ref');
                     }).appendTo('#gallery-'+ ref +' .grid');
                 });
-                
+
                 // sort groups
                 $('#content > div').sort(function(a, b) {
                     return $(b).data('ref') < $(a).data('ref');
@@ -177,15 +177,15 @@
             var size = Array.isArray(item.profile) ? item.profile.filter(function(el){ return $.inArray("SIZE", el) >= 0 ? el : null; }) : [];
             var result = [];
 
-            if ((cal.length >= 1) && (size.length >= 1)) { 
+            if ((cal.length >= 1) && (size.length >= 1)) {
                 size = size[0];
 
-                if (size.length === 6) { 
+                if (size.length === 6) {
                     $.each(cal, function(i, el){
                         if (el.length === 6) {
-                            result.push({ name: el[1], 
-                                x: parseInt(el[2], 10) / parseInt(size[4], 10) * 100, 
-                                y: parseInt(el[3], 10) / parseInt(size[5], 10) * 100, 
+                            result.push({ name: el[1],
+                                x: parseInt(el[2], 10) / parseInt(size[4], 10) * 100,
+                                y: parseInt(el[3], 10) / parseInt(size[5], 10) * 100,
                                 w: parseInt(el[4], 10) / parseInt(size[4], 10) * 100,
                                 h: parseInt(el[5], 10) / parseInt(size[5], 10) * 100
                             });
@@ -193,7 +193,7 @@
                     });
                 }
             }
-            console.log(result);
+            //console.log(result);
 
             return result;
         }
@@ -202,7 +202,7 @@
             file = file || 'venues.json';
 
             $.getJSON(file +'?t=' + Date.now(), function( data ) {
-                
+
                 var ordered = {}, diff = null;
                 Object.keys(data).sort().forEach(function(key) {
                     ordered[key] = data[key];
@@ -220,23 +220,23 @@
                     }
 
                     $.observable(venues.items).insert({id: i, ref: ref, status: el[1], profile: '', updated: el[0]});
-                    
+
                     $.get(i +'-profile.scn?t=' + Date.now(), function(data) {
                         var raw = data.replace( /\n/g, '|' ).split('|'),
                             o = getObj(i, venues.items);
 
-                        $.observable(o).setProperty('profile', 
-                            raw.map(function(tar, j) { 
-                                return tar.replace(/\t/g, ' ').split(' '); 
+                        $.observable(o).setProperty('profile',
+                            raw.map(function(tar, j) {
+                                return tar.replace(/\t/g, ' ').split(' ');
                             }).filter(function(el) {
                                 return el.length === 6; // Only return valid arrays
                             })
-                        );                    
+                        );
                     }, 'text');
                 });
 
                 $.observable(venues.ref).refresh(venues.ref.sort());
-                $.observable(venues).setProperty('list', ordered);           
+                $.observable(venues).setProperty('list', ordered);
             }).error(function() { $('#content').html(tmpl('tmpl-all-items', venues)); });
         }
 
@@ -282,7 +282,7 @@
 
                 $('#content > div:not(.empty)').each(function(i, el){
                     var side = $('#nav-side a[ref='+ $(el).data('ref').toString().toLowerCase() +']');
-                    
+
                     if ($(el).find('.item').length === $(el).find('.hidden').length) {
                         $(el).hide();
                         side.hide();
@@ -302,17 +302,17 @@
     </script>
     <!-- Templates -->
     <script type="text/x-tmpl" id="tmpl-all-items">
-        {% if (o.ref.length > 0 ) { 
-            $.each(o.ref, function( i, v ) { 
+        {% if (o.ref.length > 0 ) {
+            $.each(o.ref, function( i, v ) {
                 var filtered = $.map(o.items, function(i, e) { if (i.ref == v) return i; });
                 include('tmpl-group-items', {ref: v, list: filtered});
-            }); 
+            });
             %}<div class="empty" style="display:none;">No venues <small>change the filters see matching venues</small></div>{%
         } else { %}<div class="empty">No venues <small>refer to readme for setup instructions</small></div>{% } %}
     </script>
     <script type="text/x-tmpl" id="tmpl-group-items">
         <div id="gallery-{%=o.ref%}" data-ref="{%=o.ref.toUpperCase()%}"><a name="{%=o.ref%}" class="anchor"></a><div class="grid">
-        {%  $.each(o.list, function( j, item ) { 
+        {%  $.each(o.list, function( j, item ) {
                 if (typeof item.id === 'string') {
                     include('tmpl-item', item);
                 }
@@ -328,7 +328,7 @@
         </a>
     </script>
     <script type="text/x-tmpl" id="tmpl-item-internal">
-        {% var point = getCalibrationPoint(o); 
+        {% var point = getCalibrationPoint(o);
             var status = getItemStatus(o);
          %}
          <div class="img">
@@ -340,13 +340,13 @@
         <span class="text">{%=o.id%}</span>
         <span class="time">{%=moment(o.updated).calendar()%}</span>
         <span class="status {%=status%}">{%=status%}</span>
-    </script>        
+    </script>
     <script type="text/x-tmpl" id="tmpl-target">
         {% $.each(o, function( i, v ) { %}
         <div data-toggle="tooltip" data-placement="top" title="{%=v.name%}" class="{%=(v.name == 'lectern' ? 'red' : 'red2')%}" style="width:{%=v.w%}%; height:{%=v.h%}%; top:{%=v.y%}%; left:{%=v.x%}%;"></div>
         {% }); %}
     </script>
-    
+
     <script type="text/x-tmpl" id="tmpl-nav">
         <ul>
         {% if (o.ref.length > 2) {
