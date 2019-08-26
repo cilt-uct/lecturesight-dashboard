@@ -52,9 +52,7 @@ if ($method == 'POST') {
   }
 
   // Overview image
-  $uploadfile = $uploaddir . '-' . basename($_FILES['overview-image']['name']);
-
-  if (move_uploaded_file($_FILES['overview-image']['tmp_name'], $uploadfile)) {
+  if (move_uploaded_file($_FILES['overview-image']['tmp_name'], $uploaddir . '-overview.png')) {
     echo "File is valid, and was successfully uploaded.\n";
   } else {
      http_response_code(500);
